@@ -1,0 +1,30 @@
+name: A股开盘提醒
+
+on:
+  schedule:
+    # 开盘前提醒 (北京时间 9:00 = UTC 1:00)
+    - cron: '0 1 * * 1-5'
+    # 午盘前提醒 (北京时间 13:00 = UTC 5:00)
+    - cron: '0 5 * * 1-5'
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Run reminder
+        env:
+          SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+        run: python remind.py
